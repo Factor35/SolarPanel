@@ -1,0 +1,826 @@
+/* =======================================
+   Solar Panel Viewer - CSS Script
+   ---------------------------------------
+   This stylesheet provides the main UI and
+   accessibility styling for the Solar Panel
+   Viewer web app.
+   ======================================= */
+   
+/* === Theme and Color Variables === */
+:root {
+    /* Primary theme */
+    --primary-color: #007bff;
+    --primary-hover: #0260db;
+    --primary-active: #014bb3;
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --text-main: #333;
+    --text-secondary: #444;
+    --border-radius: 8px;
+    --transition: background-color 0.2s ease, transform 0.1s ease;
+
+    /* Baseline/reset button colors */
+    --baseline-color: #549c30;
+    --baseline-hover: #458227;
+    --baseline-active: #36691f;
+    --reset-color: #dc3545;
+    --reset-hover: #c82333;
+    --reset-active: #bd2130;
+
+    /* Modal styles */
+    --modal-bg: rgba(255, 255, 255, 0.98);
+    --modal-radius: 1rem;
+    --modal-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    --modal-btn-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+    /* Modal button colors */
+    --cancel-color: #e697cf;
+    --cancel-hover: #cc83b7;
+    --cancel-active: #b76a9f;
+    --add-color: #97e6ae;
+    --add-hover: #77ba8a;
+    --add-active: #6aa87c;
+
+    /* Input styles */
+    --input-bg: #f8f8f8;
+    --input-border: #ccc;
+    --input-focus: var(--primary-color);
+    --input-focus-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+
+}
+
+/* === Base Layout === */
+html, body {
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--font-main);
+    color: var(--text-main);
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* === Canvas Styling === */
+canvas {
+    display: block;
+}
+
+
+/* === Add Panel Modal === */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay.show .modal-content {
+    transform: translateY(0);
+}
+
+/* Modal form layout */
+#coordinateForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.modal-content {
+    background-color: var(--modal-bg);
+    padding: 2.5rem;
+    border-radius: var(--modal-radius);
+    box-shadow: var(--modal-shadow);
+    width: 90%;
+    max-width: 450px;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+    color: var(--text-secondary);
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.modal-content p.text-blue-300 {
+    color: #0300c9;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.125em;
+    font-weight: 600;
+}
+
+.modal-point-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-coordinates-row {
+    display: flex;
+    gap: 10px;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    margin-left: 20px;
+}
+
+.modal-coord-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 0;
+}
+
+.modal-coord-item label {
+    font-weight: bold;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.modal-coord-item input[type="number"] {
+    flex-grow: 1;
+    width: auto;
+    text-align: center;
+    max-width: 80px;
+    min-width: 40px;
+    font-size: 0.95em;
+}
+
+.modal-buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-left: 10px;
+}
+
+.modal-action-button {
+    padding: 10px 18px;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: var(--transition);
+    min-width: 70px;
+    box-shadow: var(--modal-btn-shadow);
+}
+
+.modal-cancel-button-style {
+    background-color: var(--cancel-color);
+}
+
+.modal-cancel-button-style:hover {
+    background-color: var(--cancel-hover);
+    transform: translateY(-1px);
+}
+
+.modal-cancel-button-style:active {
+    background-color: var(--cancel-active);
+    transform: translateY(0);
+}
+
+.modal-add-button-style {
+    background-color: var(--add-color);
+}
+
+.modal-add-button-style:hover {
+    background-color: var(--add-hover);
+    transform: translateY(-1px);
+}
+
+.modal-add-button-style:active {
+    background-color: var(--add-active);
+    transform: translateY(0);
+}
+
+/* === Input Styling === */
+input[type="number"] {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-main);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--input-focus);
+    box-shadow: var(--input-focus-shadow);
+}
+
+/* === Light Controls Sidebar === */
+#light-controls-container {
+    position: fixed;
+    top: 20px;
+    right: -210px; /* Initially off-screen to the right */
+    width: 220px;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: var(--border-radius);
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    transition: right 0.3s ease-out;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: stretch;
+    max-height: calc(100vh - 40px);
+    box-sizing: border-box;
+}
+
+#light-controls-container.expanded {
+    right: 0px;
+    z-index: 10;
+}
+
+#light-controls-container h3 {
+    margin-top: 0;
+    color: #0056b3;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+#toggle-sun-controls {
+    color: white;
+    border: none;
+    border-radius: 8px 0 0 8px;
+    padding: 0px 5px;
+    cursor: pointer;
+    font-size: 1.5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease-out;
+    z-index: 1001;
+    box-sizing: border-box;
+    width: 35px;
+    min-width: 35px;
+    max-width: 35px;
+    left: -25px;
+    right: auto;
+}
+
+#toggle-sun-controls:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+#toggle-sun-controls:active {
+    background-color: var(--primary-active);
+    transform: translateY(0);
+}
+
+#light-controls-container.expanded #toggle-sun-controls {
+    right: 0;
+}
+
+.arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.left-arrow {
+    border-right: 12px solid white;
+}
+
+.right-arrow {
+    border-left: 12px solid white;
+}
+
+#sun-controls-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-left: 25px; 
+    padding-right: 15px;
+    overflow: hidden;
+    transition: opacity 0.3s ease-out;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#light-controls-container.collapsed #sun-controls-content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.input-group, .slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label, .slider-group label {
+    font-weight: bold;
+    color: var(--text-secondary);
+    font-size: 0.95em;
+}
+
+#time-input {
+    text-align: center;
+}
+
+.input-group input[type="number"],
+.input-group input[type="date"],
+.slider-group input[type="range"] {
+    width: calc(100% - 10px);
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+#sun-controls-content .input-group input[type="number"],
+#sun-controls-content .input-group input[type="date"] {
+    width: 100%;
+    min-width: unset;
+    padding: 12px 8px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.input-group input[type="date"],
+.slider-group input[type="range"] {
+    cursor: pointer;
+}
+
+.slider-group span {
+    text-align: right;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* === Loading Screen Overlay === */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 7000;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.loading-content {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.progress-text {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* === Main UI Container === */
+#main-ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* === Control Groups (Rotation, View, etc.) === */
+.control-group {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    pointer-events: auto;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+}
+
+.control-group button {
+    padding: 8px 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: var(--transition);
+    min-width: 70px;
+}
+
+.control-group button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.control-group button:active {
+    background-color: var(--primary-active);
+    transform: translateY(0);
+}
+
+.control-group label {
+    font-weight: bold;
+    color: var(--text-secondary);
+    font-size: 0.95em;
+}
+
+.control-group input[type="number"] {
+    padding: 7px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    width: 80px;
+    font-size: 0.9em;
+    box-sizing: border-box;
+}
+
+/* === Rotation Controls Section === */
+#rotation-controls {
+    top: 20px;
+    left: 20px;
+    align-items: flex-start;
+    width: 225px;
+}
+
+#rotation-controls input {
+    margin-bottom: 8px;
+    text-align: center;
+    width: 100%;
+}
+
+.rotation-pair {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.rotation-pair span {
+    font-weight: bold;
+    min-width: 65px;
+    text-align: right;
+    color: #444;
+}
+
+#rotation-controls button {
+    flex-grow: 1;
+    text-align: center;
+}
+
+#setBaselineBtn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1em;
+    background-color: var(--baseline-color);
+}
+
+#setBaselineBtn:hover {
+    background-color: var(--baseline-hover);
+}
+
+#setBaselineBtn:active {
+    background-color: var(--baseline-active);
+    transform: translateY(0);
+}
+
+#resetModelOrientationBtn {
+    margin-bottom: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1em;
+    background-color: var(--reset-color);
+}
+
+#resetModelOrientationBtn:hover {
+    background-color: var(--reset-hover);
+}
+
+#resetModelOrientationBtn:active {
+    background-color: var(--reset-active);
+    transform: translateY(0);
+}
+
+/* === View Controls Section === */
+#view-controls {
+    top: 20px;
+    right: 50px;
+    width: 150px;
+}
+
+#view-controls button {
+    width: 100%;
+}
+
+/* === Object Coordinates Popup === */
+#coordinate-popup {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 160px;
+    top: 20px;
+    right: 250px;
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+#coordinate-popup h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--text-main);
+    text-align: center;
+    font-size: 1.1em;
+}
+
+#coordinate-popup label {
+    display: inline-block;
+    width: 30px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+#coordinate-popup input {
+    width: calc(100% - 40px);
+    margin-bottom: 5px;
+    padding: 7px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    font-size: 0.95em;
+    box-sizing: border-box;
+}
+
+input[type="number"]:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    opacity: 0.7;
+}
+
+/* === Shadow Coverage Popup === */
+#shadow-coverage-popup {
+    position: fixed;
+    top: 216px;
+    right: 250px;
+    width: 160px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 1em;
+    pointer-events: auto;
+}
+
+#shadow-coverage-popup h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #0056b3;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+.coverage-row {
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+}
+
+/* === Icon Buttons: Delete, Add, Export === */
+.icon-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 60px;
+    height: 48px;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    pointer-events: auto;
+}
+
+.icon-button:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-1px);
+}
+
+.icon-button:active {
+    background-color: #d0d0d0;
+    transform: translateY(0);
+}
+
+.icon-button svg {
+    width: 75%;
+    height: 75%;
+    color: #333;
+    pointer-events: none;
+    flex-shrink: 0;
+}
+
+/* === Tooltip Styling for Icon Buttons === */
+.tooltip-text {
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.button-wrapper:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* === Button Container (Bottom Right) === */
+.button-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+    z-index: 100;
+}
+
+/* === Button Wrapper for Tooltips === */
+.button-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* === Utility: Hidden Class === */
+.hidden {
+    display: none;
+}
+
+/* === Screen Reader Only Utility === */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* === Responsive Design for Mobile/Tablet === */
+@media (max-width: 768px) {
+    #rotation-controls {
+        left: 10px;
+        top: 10px;
+        padding: 10px;
+        font-size: 0.9em;
+        width: auto;
+        max-width: 200px;
+    }
+
+    #view-controls {
+        right: 10px;
+        top: 10px;
+        padding: 10px;
+        font-size: 0.9em;
+        width: 120px;
+    }
+
+    #coordinate-popup {
+        top: 10px;
+        right: calc(10px + 120px + 10px);
+        padding: 10px;
+        min-width: 150px;
+        font-size: 0.9em;
+    }
+
+    .control-group button {
+        padding: 6px 10px;
+        font-size: 0.85em;
+    }
+
+    .control-group input[type="number"] {
+        padding: 5px;
+        font-size: 0.85em;
+    }
+
+    .rotation-pair span {
+        min-width: 45px;
+    }
+
+    #resetModelOrientationBtn {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+
+    #light-controls-container {
+        width: 220px;
+        right: -200px;
+    }
+
+    #light-controls-container.expanded {
+        right: 0px;
+    }
+
+    #toggle-sun-controls {
+        right: 0px;
+        width: 20px;
+        min-width: 20px;
+        max-width: 20px;
+    }
+
+    #sun-controls-content {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    #sun-controls-content .input-group input[type="number"],
+    #sun-controls-content .input-group input[type="date"] {
+        padding: 10px 8px;
+        font-size: 1.0em;
+    }
+}
